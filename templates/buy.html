@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Buy Items - CampusXchange{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-layout">
+        <!-- Sidebar Filters -->
+        <aside class="sidebar">
+            <!-- Categories Filter -->
+            <div class="filter-card">
+                <div class="filter-header" onclick="toggleFilter(this)">
+                    <span>CATEGORIES</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="filter-content">
+                    <div class="category-list">
+                        <a href="{% url 'buy' %}" class="category-item {% if not selected_category %}active{% endif %}">
+                            <i class="fas fa-th-large"></i>
+                            <span>All Categories</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=textbooks" class="category-item {% if selected_category == 'textbooks' %}active{% endif %}">
+                            <i class="fas fa-book"></i>
+                            <span>Textbooks & Notes</span>
+                            <span class="category-count">500</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=electronics" class="category-item {% if selected_category == 'electronics' %}active{% endif %}">
+                            <i class="fas fa-laptop"></i>
+                            <span>Electronics</span>
+                            <span class="category-count">350</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=engineering" class="category-item {% if selected_category == 'engineering' %}active{% endif %}">
+                            <i class="fas fa-drafting-compass"></i>
+                            <span>Engineering Tools</span>
+                            <span class="category-count">200</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=furniture" class="category-item {% if selected_category == 'furniture' %}active{% endif %}">
+                            <i class="fas fa-chair"></i>
+                            <span>Study Furniture</span>
+                            <span class="category-count">150</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=vehicles" class="category-item {% if selected_category == 'vehicles' %}active{% endif %}">
+                            <i class="fas fa-motorcycle"></i>
+                            <span>Vehicles</span>
+                            <span class="category-count">80</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=gadgets" class="category-item {% if selected_category == 'gadgets' %}active{% endif %}">
+                            <i class="fas fa-vr-cardboard"></i>
+                            <span>Gadgets</span>
+                            <span class="category-count">250</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=printers" class="category-item {% if selected_category == 'printers' %}active{% endif %}">
+                            <i class="fas fa-print"></i>
+                            <span>Printers & Xerox</span>
+                            <span class="category-count">45</span>
+                        </a>
+                        <a href="{% url 'buy' %}?category=clocks" class="category-item {% if selected_category == 'clocks' %}active{% endif %}">
+                            <i class="fas fa-clock"></i>
+                            <span>Alarm Clocks</span>
+                            <span class="category-count">30</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Filter -->
+            <div class="filter-card">
+                <div class="filter-header" onclick="toggleFilter(this)">
+                    <span>LOCATIONS</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="filter-content">
+                    <div class="category-list">
+                        <a href="#" class="category-item active">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>All Locations</span>
+                        </a>
+                        <a href="#" class="category-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Mumbai</span>
+                        </a>
+                        <a href="#" class="category-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Navi Mumbai</span>
+                        </a>
+                        <a href="#" class="category-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Thane</span>
+                        </a>
+                        <a href="#" class="category-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Campus Area</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Filter -->
+            <div class="filter-card">
+                <div class="filter-header" onclick="toggleFilter(this)">
+                    <span>BUDGET</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="filter-content">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Choose a range below</p>
+                    <div class="price-range">
+                        <div class="price-input">
+                            <label>Min</label>
+                            <input type="number" placeholder="₹0" id="minPrice">
+                        </div>
+                        <span class="price-separator">to</span>
+                        <div class="price-input">
+                            <label>Max</label>
+                            <input type="number" placeholder="₹50000" id="maxPrice">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="width: 100%; margin-top: 16px;" onclick="applyPriceFilter()">Apply</button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-card">
+                <div class="filter-header" onclick="toggleFilter(this)">
+                    <span>Filters</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="filter-content">
+                    <div class="checkbox-list">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="negotiable" onchange="applyFilters()">
+                            <label for="negotiable">Negotiable</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="freeItems" onchange="applyFilters()">
+                            <label for="freeItems">Free Items (Donations)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="exchange" onchange="applyFilters()">
+                            <label for="exchange">Available for Exchange</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="featured" onchange="applyFilters()">
+                            <label for="featured">Featured Only</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Filter -->
+            <div class="filter-card">
+                <div class="filter-header" onclick="toggleFilter(this)">
+                    <span>CONDITION</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="filter-content">
+                    <div class="checkbox-list">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="likeNew" onchange="applyFilters()">
+                            <label for="likeNew">Like New</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="excellent" onchange="applyFilters()">
+                            <label for="excellent">Excellent</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="good" onchange="applyFilters()">
+                            <label for="good">Good</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="fair" onchange="applyFilters()">
+                            <label for="fair">Fair</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Products Section -->
+        <section class="products-section">
+            <div class="products-header">
+                <div class="products-count">
+                    <strong>{{ items.count|default:"1,250" }}</strong> ads near <strong>Mumbai University</strong>
+                </div>
+                <div class="products-sort">
+                    <label>SORT BY :</label>
+                    <select class="sort-select" id="sortSelect" onchange="sortProducts()">
+                        <option value="date">Date Published</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                        <option value="relevance">Relevance</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                {% for item in items %}
+                <a href="{% url 'item_detail' item.id %}" class="product-card" data-price="{{ item.price }}" data-category="{{ item.category }}" data-quality="{{ item.quality }}">
+                    <div class="product-image">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                        {% else %}
+                        <div class="product-placeholder"><i class="fas fa-image"></i></div>
+                        {% endif %}
+                        <div class="product-badges">
+                            {% if item.is_featured %}<span class="badge badge-featured">Featured</span>{% endif %}
+                            {% if item.is_negotiable %}<span class="badge badge-negotiable">Negotiable</span>{% endif %}
+                            {% if item.listing_type == 'donate' %}<span class="badge badge-free">Free</span>{% endif %}
+                        </div>
+                        <button class="wishlist-btn" onclick="event.preventDefault(); toggleWishlist({{ item.id }})">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">{% if item.listing_type == 'donate' %}Free{% else %}₹ {{ item.price|floatformat:0 }}{% endif %}</div>
+                        <h3 class="product-title">{{ item.title }}</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> {{ item.location }}</span>
+                            <span class="product-date">{{ item.created_at|timesince }} ago</span>
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <!-- Demo Products -->
+
+                        <div class="product-badges"><span class="badge badge-featured">Featured</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 20,000</div>
+                        <h3 class="product-title">Real wood heritage wardrobe - Study Table Set</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Ulwe, Navi Mumbai</span>
+                            <span class="product-date">FEB 11</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="250" data-category="textbooks">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-book"></i></div>
+                        <div class="product-badges"><span class="badge badge-negotiable">Negotiable</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button><a href="#" class="product-card" data-price="23000" data-category="electronics">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-laptop"></i></div>
+                        <div class="product-badges"><span class="badge badge-featured">Featured</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 23,000</div>
+                        <h3 class="product-title">Dell Laptop i5 8th Gen - 8GB RAM 256GB SSD</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Ulwe, Navi Mumbai</span>
+                            <span class="product-date">6 DAYS AGO</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="51000" data-category="vehicles">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-motorcycle"></i></div>
+                        <div class="product-badges"><span class="badge badge-featured">Featured</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 51,000</div>
+                        <h3 class="product-title">Maruti Suzuki Wagon R Tour H3 Petrol + CNG</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Ulwe, Navi Mumbai</span>
+                            <span class="product-date">FEB 11</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="20000" data-category="furniture">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-couch"></i></div>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 250</div>
+                        <h3 class="product-title">M2 Textbook Mumbai University Exam PYQ</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Campus</span>
+                            <span class="product-date">TODAY</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="1200" data-category="engineering">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-microchip"></i></div>
+                        <div class="product-badges"><span class="badge badge-exchange">Exchange</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 1,200</div>
+                        <h3 class="product-title">Arduino Uno R3 Complete IoT Starter Kit</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Campus</span>
+                            <span class="product-date">2 DAYS AGO</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="800" data-category="engineering">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-drafting-compass"></i></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 800</div>
+                        <h3 class="product-title">Engineering Graphics Kit - Drafter Roller Scales</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Mumbai</span>
+                            <span class="product-date">3 DAYS AGO</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="18000" data-category="gadgets">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-vr-cardboard"></i></div>
+                        <div class="product-badges"><span class="badge badge-negotiable">Negotiable</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 18,000</div>
+                        <h3 class="product-title">Oculus Quest 2 VR Headset with Controllers</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Campus</span>
+                            <span class="product-date">5 DAYS AGO</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="1500" data-category="gadgets">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-wifi"></i></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 1,500</div>
+                        <h3 class="product-title">TP-Link WiFi Router Dual Band - Like New</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Thane</span>
+                            <span class="product-date">1 WEEK AGO</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="0" data-category="textbooks">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-sticky-note"></i></div>
+                        <div class="product-badges"><span class="badge badge-free">Free</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">Free</div>
+                        <h3 class="product-title">Handwritten DSA Notes - Complete Course</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Campus</span>
+                            <span class="product-date">TODAY</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="3500" data-category="electronics">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-headphones"></i></div>
+                        <div class="product-badges"><span class="badge badge-negotiable">Negotiable</span></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 3,500</div>
+                        <h3 class="product-title">Sony WH-1000XM4 Wireless Headphones</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Mumbai</span>
+                            <span class="product-date">4 DAYS AGO</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="8000" data-category="electronics">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-mobile-alt"></i></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 8,000</div>
+                        <h3 class="product-title">Samsung Galaxy A52 - 6GB RAM 128GB</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Navi Mumbai</span>
+                            <span class="product-date">2 DAYS AGO</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="product-card" data-price="4500" data-category="printers">
+                    <div class="product-image">
+                        <div class="product-placeholder"><i class="fas fa-print"></i></div>
+                        <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-price">₹ 4,500</div>
+                        <h3 class="product-title">HP LaserJet Printer - Xerox Machine</h3>
+                        <div class="product-meta">
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> Campus</span>
+                            <span class="product-date">1 WEEK AGO</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            <div class="view-all-container" style="margin-top: 32px;">
+                <button class="btn btn-outline btn-lg" onclick="loadMore()">
+                    <i class="fas fa-plus"></i> Load More Items
+                </button>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleFilter(header) {
+    header.classList.toggle('collapsed');
+    header.nextElementSibling.classList.toggle('collapsed');
+}
+
+function applyPriceFilter() {
+    const min = document.getElementById('minPrice').value || 0;
+    const max = document.getElementById('maxPrice').value || 999999;
+    const cards = document.querySelectorAll('.product-card');
+    
+    cards.forEach(card => {
+        const price = parseInt(card.dataset.price) || 0;
+        if (price >= min && price <= max) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function sortProducts() {
+    const sortBy = document.getElementById('sortSelect').value;
+    const grid = document.getElementById('productsGrid');
+    const cards = Array.from(grid.querySelectorAll('.product-card'));
+    
+    cards.sort((a, b) => {
+        const priceA = parseInt(a.dataset.price) || 0;
+        const priceB = parseInt(b.dataset.price) || 0;
+        
+        if (sortBy === 'price_low') return priceA - priceB;
+        if (sortBy === 'price_high') return priceB - priceA;
+        return 0;
+    });
+    
+    cards.forEach(card => grid.appendChild(card));
+}
+
+function applyFilters() {
+    // Implement filter logic here
+    console.log('Filters applied');
+}
+
+function loadMore() {
+    // Implement load more logic
+    alert('Loading more items...');
+}
+
+function toggleWishlist(itemId) {
+    const btn = event.target.closest('.wishlist-btn');
+    btn.classList.toggle('active');
+    const icon = btn.querySelector('i');
+    icon.classList.toggle('far');
+    icon.classList.toggle('fas');
+}
+</script>
+{% endblock %}

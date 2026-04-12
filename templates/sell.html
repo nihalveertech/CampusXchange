@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sell Your Item - CampusXchange{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1><i class="fas fa-tag" style="color: var(--secondary-color);"></i> Sell Your Item</h1>
+                <p>Fill in the details below to list your item for sale</p>
+            </div>
+
+            <form method="POST" action="{% url 'sell' %}" enctype="multipart/form-data" id="sellForm">
+                {% csrf_token %}
+                <input type="hidden" name="listing_type" value="sell">
+
+                <!-- Images Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-camera"></i> Upload Photos</h3>
+                    <div class="image-upload" id="imageUpload" onclick="document.getElementById('imageInput').click()">
+                        <div class="image-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <h4>Click to upload images</h4>
+                        <p>or drag and drop your images here (Max 5 images, 5MB each)</p>
+                        <input type="file" id="imageInput" name="images" accept="image/*" multiple style="display: none;" onchange="previewImages(this)">
+                    </div>
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+
+                <!-- Item Details Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Item Details</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Item Title <span class="required">*</span></label>
+                        <input type="text" name="title" class="form-input" placeholder="e.g., M2 Textbook Mumbai University" required maxlength="100">
+                        <p class="form-hint">Be specific - include brand, model, condition in title</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category <span class="required">*</span></label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select a category</option>
+                            <option value="textbooks">📚 Textbooks & Notes</option>
+                            <option value="electronics">💻 Electronics (Laptops, Tablets, PCs)</option>
+                            <option value="smartphones">📱 Smartphones</option>
+                            <option value="engineering">🔧 Engineering Tools (Drafter, Arduino, IoT)</option>
+                            <option value="furniture">🪑 Study Furniture (Chairs, Tables)</option>
+                            <option value="vehicles">🏍️ Vehicles (Bikes, Scooters, Bicycles)</option>
+                            <option value="gadgets">🎮 Gadgets (VR, Headphones, WiFi Router)</option>
+                            <option value="printers">🖨️ Printers & Xerox Machines</option>
+                            <option value="clocks">⏰ Alarm Clocks</option>
+                            <option value="notes">📝 Handwritten Notes</option>
+                            <option value="other">📦 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description <span class="required">*</span></label>
+                        <textarea name="description" class="form-textarea" rows="5" placeholder="Describe your item in detail - include features, condition, reason for selling, any defects..." required></textarea>
+                        <p class="form-hint">Minimum 50 characters. Better description = faster sale!</p>
+                    </div>
+                </div>
+
+                <!-- Pricing Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-rupee-sign"></i> Pricing</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Price (₹) <span class="required">*</span></label>
+                        <input type="number" name="price" class="form-input" placeholder="Enter price in INR" required min="1">
+                        <p class="form-hint">Set a fair price based on condition and market value</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Is Price Negotiable?</label>
+                        <div class="toggle-group">
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="is_negotiable" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Allow buyers to negotiate the price</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quality Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-star"></i> Item Condition</h3>
+                    
+                    <div class="quality-options">
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="likeNew" value="like_new" required>
+                            <label for="likeNew">
+                                <i class="fas fa-sparkles"></i>
+                                <span>Like New</span>
+                            </label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="excellent" value="excellent">
+                            <label for="excellent">
+                                <i class="fas fa-star"></i>
+                                <span>Excellent</span>
+                            </label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="good" value="good">
+                            <label for="good">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span>Good</span>
+                            </label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="fair" value="fair">
+                            <label for="fair">
+                                <i class="fas fa-hand-paper"></i>
+                                <span>Fair</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-map-marker-alt"></i> Location</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Pickup Location <span class="required">*</span></label>
+                        <select name="location" class="form-select" required>
+                            <option value="">Select location</option>
+                            <option value="Campus">Campus</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Navi Mumbai">Navi Mumbai</option>
+                            <option value="Thane">Thane</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Specific Address (Optional)</label>
+                        <input type="text" name="address" class="form-input" placeholder="e.g., Near Main Gate, Building A">
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-phone-alt"></i> Contact Information</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number <span class="required">*</span></label>
+                        <input type="tel" name="phone" class="form-input" placeholder="+91 9876543210" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="showPhone" name="show_phone">
+                            <label for="showPhone">Show phone number on listing</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-section" style="border-bottom: none; margin-bottom: 0;">
+                    <button type="submit" class="btn btn-secondary btn-lg" style="width: 100%;">
+                        <i class="fas fa-check-circle"></i> Post Your Ad
+                    </button>
+                    <p class="form-hint" style="text-align: center; margin-top: 16px;">
+                        By posting, you agree to our <a href="#" style="color: var(--primary-color);">Terms of Service</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewImages(input) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    
+    if (input.files) {
+        Array.from(input.files).slice(0, 5).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview ${index + 1}">
+                    <button type="button" class="preview-remove" onclick="removeImage(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+function removeImage(index) {
+    // Note: This is a simple implementation. For full functionality, 
+    // you'd need to manage a file list and update the input
+    const preview = document.getElementById('imagePreview');
+    preview.children[index].remove();
+}
+
+// Drag and drop
+const uploadArea = document.getElementById('imageUpload');
+const imageInput = document.getElementById('imageInput');
+
+uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    imageInput.files = e.dataTransfer.files;
+    previewImages(imageInput);
+});
+document.getElementById("sellForm").addEventListener("submit", function() {
+    console.log("FORM SUBMITTED");
+});
+</script>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donate Items - CampusXchange{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1><i class="fas fa-gift" style="color: var(--success-color);"></i> Donate an Item</h1>
+                <p>Help fellow students by donating items you no longer need</p>
+            </div>
+
+            <!-- Info Banner -->
+            <div style="background: linear-gradient(135deg, rgba(35, 198, 83, 0.1) 0%, rgba(29, 160, 64, 0.1) 100%); padding: 20px; border-radius: var(--radius-md); margin-bottom: 32px; border-left: 4px solid var(--success-color);">
+                <h4 style="color: var(--success-color); margin-bottom: 8px;"><i class="fas fa-heart"></i> Why Donate?</h4>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                    Your donation can help a fellow student in need. Textbooks, notes, and supplies that you no longer need could be invaluable to someone else. Plus, it's a great way to declutter!
+                </p>
+            </div>
+
+            <form method="POST" action="{% url 'donate' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="listing_type" value="donate">
+                <input type="hidden" name="price" value="0">
+
+                <!-- Images Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-camera"></i> Upload Photos</h3>
+                    <div class="image-upload" onclick="document.getElementById('donateImageInput').click()">
+                        <div class="image-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <h4>Click to upload images</h4>
+                        <p>Help others see what you're donating (Max 5 images)</p>
+                        <input type="file" id="donateImageInput" name="images" accept="image/*" multiple style="display: none;" onchange="previewDonateImages(this)">
+                    </div>
+                    <div class="image-preview" id="donateImagePreview"></div>
+                </div>
+
+                <!-- Item Details -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Item Details</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Item Title <span class="required">*</span></label>
+                        <input type="text" name="title" class="form-input" placeholder="e.g., Engineering Mathematics Textbook" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category <span class="required">*</span></label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select a category</option>
+                            <option value="textbooks">📚 Textbooks</option>
+                            <option value="notes">📝 Handwritten Notes</option>
+                            <option value="electronics">💻 Electronics</option>
+                            <option value="engineering">🔧 Engineering Tools</option>
+                            <option value="furniture">🪑 Furniture</option>
+                            <option value="clothing">👕 Clothing</option>
+                            <option value="other">📦 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description <span class="required">*</span></label>
+                        <textarea name="description" class="form-textarea" rows="4" placeholder="Describe the item - condition, why you're donating it, who might benefit..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- Condition -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-star"></i> Item Condition</h3>
+                    <div class="quality-options">
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="donateNew" value="like_new" required>
+                            <label for="donateNew"><i class="fas fa-sparkles"></i><span>Like New</span></label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="donateGood" value="good">
+                            <label for="donateGood"><i class="fas fa-thumbs-up"></i><span>Good</span></label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="donateFair" value="fair">
+                            <label for="donateFair"><i class="fas fa-hand-paper"></i><span>Fair</span></label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="donateUsable" value="usable">
+                            <label for="donateUsable"><i class="fas fa-check"></i><span>Usable</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-map-marker-alt"></i> Pickup Location</h3>
+                    <div class="form-group">
+                        <label class="form-label">Location <span class="required">*</span></label>
+                        <select name="location" class="form-select" required>
+                            <option value="">Select pickup location</option>
+                            <option value="Campus">Campus</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Navi Mumbai">Navi Mumbai</option>
+                            <option value="Thane">Thane</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-phone-alt"></i> Contact</h3>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number <span class="required">*</span></label>
+                        <input type="tel" name="phone" class="form-input" placeholder="+91 9876543210" required>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-section" style="border-bottom: none;">
+                    <button type="submit" class="btn btn-success btn-lg" style="width: 100%;">
+                        <i class="fas fa-heart"></i> Donate Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewDonateImages(input) {
+    const preview = document.getElementById('donateImagePreview');
+    preview.innerHTML = '';
+    if (input.files) {
+        Array.from(input.files).slice(0, 5).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `<img src="${e.target.result}" alt="Preview"><button type="button" class="preview-remove" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+}
+</script>
+{% endblock %}

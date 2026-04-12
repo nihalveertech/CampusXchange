@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Exchange Items - CampusXchange{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1><i class="fas fa-sync-alt" style="color: var(--info-color);"></i> Exchange an Item</h1>
+                <p>Trade your items directly with other students</p>
+            </div>
+
+            <!-- Info Banner -->
+            <div style="background: linear-gradient(135deg, rgba(51, 181, 229, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%); padding: 20px; border-radius: var(--radius-md); margin-bottom: 32px; border-left: 4px solid var(--info-color);">
+                <h4 style="color: var(--info-color); margin-bottom: 8px;"><i class="fas fa-exchange-alt"></i> How Exchange Works</h4>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                    List what you have and what you're looking for. When someone has what you need and wants what you have, connect and trade directly - no money needed!
+                </p>
+            </div>
+
+            <form method="POST" action="{% url 'exchange' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="listing_type" value="exchange">
+
+                <!-- Your Item Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-box"></i> What You're Offering</h3>
+                    
+                    <div class="image-upload" onclick="document.getElementById('exchangeImageInput').click()">
+                        <div class="image-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <h4>Upload photos of your item</h4>
+                        <p>Show what you're willing to trade</p>
+                        <input type="file" id="exchangeImageInput" name="images" accept="image/*" multiple style="display: none;" onchange="previewExchangeImages(this)">
+                    </div>
+                    <div class="image-preview" id="exchangeImagePreview"></div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label class="form-label">Item Title <span class="required">*</span></label>
+                        <input type="text" name="title" class="form-input" placeholder="e.g., Arduino Uno Kit" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category <span class="required">*</span></label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select category</option>
+                            <option value="textbooks">📚 Textbooks & Notes</option>
+                            <option value="electronics">💻 Electronics</option>
+                            <option value="engineering">🔧 Engineering Tools</option>
+                            <option value="furniture">🪑 Furniture</option>
+                            <option value="gadgets">🎮 Gadgets</option>
+                            <option value="other">📦 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description <span class="required">*</span></label>
+                        <textarea name="description" class="form-textarea" rows="3" placeholder="Describe your item in detail..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Estimated Value (₹)</label>
+                        <input type="number" name="price" class="form-input" placeholder="Approximate value of your item">
+                        <p class="form-hint">This helps in fair exchanges</p>
+                    </div>
+                </div>
+
+                <!-- What You Want Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-search"></i> What You're Looking For</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Items You Want <span class="required">*</span></label>
+                        <input type="text" name="wanted_items" class="form-input" placeholder="e.g., Scientific Calculator, DSA Notes, Headphones" required>
+                        <p class="form-hint">List items you'd be willing to exchange for (comma separated)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Preferred Category</label>
+                        <select name="wanted_category" class="form-select">
+                            <option value="">Any category</option>
+                            <option value="textbooks">📚 Textbooks & Notes</option>
+                            <option value="electronics">💻 Electronics</option>
+                            <option value="engineering">🔧 Engineering Tools</option>
+                            <option value="furniture">🪑 Furniture</option>
+                            <option value="gadgets">🎮 Gadgets</option>
+                            <option value="other">📦 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="openToOffers" name="open_to_offers" checked>
+                            <label for="openToOffers">Open to other exchange offers</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Condition -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-star"></i> Item Condition</h3>
+                    <div class="quality-options">
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="exchNew" value="like_new" required>
+                            <label for="exchNew"><i class="fas fa-sparkles"></i><span>Like New</span></label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="exchExcellent" value="excellent">
+                            <label for="exchExcellent"><i class="fas fa-star"></i><span>Excellent</span></label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="exchGood" value="good">
+                            <label for="exchGood"><i class="fas fa-thumbs-up"></i><span>Good</span></label>
+                        </div>
+                        <div class="quality-option">
+                            <input type="radio" name="quality" id="exchFair" value="fair">
+                            <label for="exchFair"><i class="fas fa-hand-paper"></i><span>Fair</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-map-marker-alt"></i> Exchange Location</h3>
+                    <div class="form-group">
+                        <label class="form-label">Preferred Location <span class="required">*</span></label>
+                        <select name="location" class="form-select" required>
+                            <option value="">Select location</option>
+                            <option value="Campus">Campus</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Navi Mumbai">Navi Mumbai</option>
+                            <option value="Thane">Thane</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="form-section">
+                    <h3 class="form-section-title"><i class="fas fa-phone-alt"></i> Contact</h3>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number <span class="required">*</span></label>
+                        <input type="tel" name="phone" class="form-input" placeholder="+91 9876543210" required>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-section" style="border-bottom: none;">
+                    <button type="submit" class="btn btn-lg" style="width: 100%; background: linear-gradient(135deg, #33b5e5 0%, #0099cc 100%); color: white; border: none;">
+                        <i class="fas fa-sync-alt"></i> Post Exchange Listing
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewExchangeImages(input) {
+    const preview = document.getElementById('exchangeImagePreview');
+    preview.innerHTML = '';
+    if (input.files) {
+        Array.from(input.files).slice(0, 5).forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `<img src="${e.target.result}" alt="Preview"><button type="button" class="preview-remove" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+}
+</script>
+{% endblock %}

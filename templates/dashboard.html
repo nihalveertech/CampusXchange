@@ -1,0 +1,471 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Dashboard - CampusXchange{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="dashboard-profile">
+                <div class="dashboard-avatar">
+                    {{ user.first_name|slice:":1"|default:"U" }}{{ user.last_name|slice:":1"|default:"S" }}
+                </div>
+                <h3>{{ user.get_full_name|default:"User Name" }}</h3>
+                <p>{{ user.email|default:"user@college.edu" }}</p>
+            </div>
+            <nav class="dashboard-nav">
+                <a href="#overview" class="dashboard-nav-item active" onclick="showSection('overview', this)">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="#listings" class="dashboard-nav-item" onclick="showSection('listings', this)">
+                    <i class="fas fa-list"></i> My Listings
+                </a>
+                <a href="#purchases" class="dashboard-nav-item" onclick="showSection('purchases', this)">
+                    <i class="fas fa-shopping-bag"></i> Purchases
+                </a>
+                <a href="#wishlist" class="dashboard-nav-item" onclick="showSection('wishlist', this)">
+                    <i class="fas fa-heart"></i> Wishlist
+                </a>
+                <a href="#messages" class="dashboard-nav-item" onclick="showSection('messages', this)">
+                    <i class="fas fa-comments"></i> Messages
+                </a>
+                <a href="#settings" class="dashboard-nav-item" onclick="showSection('settings', this)">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="dashboard-nav-item" style="color: var(--danger-color);">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Overview Section -->
+            <section id="overview" class="dashboard-section">
+                <div class="dashboard-header">
+                    <h1>Welcome back, {{ user.first_name|default:"User" }}!</h1>
+                    <a href="{% url 'sell' %}" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Post New Ad
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon primary"><i class="fas fa-list"></i></div>
+                        <div class="stat-content">
+                            <h3>{{ user_listings_count|default:"12" }}</h3>
+                            <p>Active Listings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-content">
+                            <h3>{{ sold_count|default:"8" }}</h3>
+                            <p>Items Sold</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-content">
+                            <h3>{{ purchases_count|default:"5" }}</h3>
+                            <p>Purchases</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon info"><i class="fas fa-heart"></i></div>
+                        <div class="stat-content">
+                            <h3>{{ wishlist_count|default:"15" }}</h3>
+                            <p>Wishlist Items</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Recent Activity</h2>
+                        <a href="#listings" class="btn btn-sm btn-outline" onclick="showSection('listings', document.querySelector('[href=\"#listings\"]'))">View All</a>
+                    </div>
+                    <div class="dashboard-card-body" style="padding: 0;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Type</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="table-product">
+                                            <div class="table-product-image"><i class="fas fa-laptop" style="padding: 12px; color: var(--text-muted);"></i></div>
+                                            <div class="table-product-info">
+                                                <h4>Dell Laptop i5</h4>
+                                                <p>Electronics</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Sell</td>
+                                    <td>₹25,000</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>Feb 19, 2026</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                            <button class="table-action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn danger" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-product">
+                                            <div class="table-product-image"><i class="fas fa-book" style="padding: 12px; color: var(--text-muted);"></i></div>
+                                            <div class="table-product-info">
+                                                <h4>M2 Textbook</h4>
+                                                <p>Textbooks</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Sell</td>
+                                    <td>₹250</td>
+                                    <td><span class="status-badge sold">Sold</span></td>
+                                    <td>Feb 15, 2026</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="Invoice" onclick="generateInvoice()"><i class="fas fa-file-invoice"></i></button>
+                                            <button class="table-action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-product">
+                                            <div class="table-product-image"><i class="fas fa-microchip" style="padding: 12px; color: var(--text-muted);"></i></div>
+                                            <div class="table-product-info">
+                                                <h4>Arduino Uno Kit</h4>
+                                                <p>Engineering</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Exchange</td>
+                                    <td>₹1,200</td>
+                                    <td><span class="status-badge pending">Pending</span></td>
+                                    <td>Feb 18, 2026</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                            <button class="table-action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn danger" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-product">
+                                            <div class="table-product-image"><i class="fas fa-sticky-note" style="padding: 12px; color: var(--text-muted);"></i></div>
+                                            <div class="table-product-info">
+                                                <h4>DSA Notes</h4>
+                                                <p>Notes</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Donate</td>
+                                    <td>Free</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>Feb 17, 2026</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                            <button class="table-action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn danger" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Listings Section -->
+            <section id="listings" class="dashboard-section" style="display: none;">
+                <div class="dashboard-header">
+                    <h1>My Listings</h1>
+                    <a href="{% url 'sell' %}" class="btn btn-secondary"><i class="fas fa-plus"></i> Add New</a>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>All Listings ({{ user_listings_count|default:"12" }})</h2>
+                        <select class="sort-select" style="width: auto;">
+                            <option>All Status</option>
+                            <option>Active</option>
+                            <option>Sold</option>
+                            <option>Pending</option>
+                        </select>
+                    </div>
+                    <div class="dashboard-card-body" style="padding: 0;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Views</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in user_listings %}
+                                <tr>
+                                    <td>
+                                        <div class="table-product">
+                                            <div class="table-product-image">
+                                                {% if item.image %}<img src="{{ item.image.url }}">{% else %}<i class="fas fa-image" style="padding: 12px; color: var(--text-muted);"></i>{% endif %}
+                                            </div>
+                                            <div class="table-product-info">
+                                                <h4>{{ item.title }}</h4>
+                                                <p>{{ item.get_listing_type_display }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ item.get_category_display }}</td>
+                                    <td>{% if item.price %}₹{{ item.price }}{% else %}Free{% endif %}</td>
+                                    <td>{{ item.views|default:"0" }}</td>
+                                    <td><span class="status-badge {{ item.status }}">{{ item.get_status_display }}</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="{% url 'edit_item' item.id %}" class="table-action-btn"><i class="fas fa-edit"></i></a>
+                                            <a href="{% url 'item_detail' item.id %}" class="table-action-btn"><i class="fas fa-eye"></i></a>
+                                            <button class="table-action-btn danger" onclick="deleteItem({{ item.id }})"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 40px;">
+                                        <i class="fas fa-box-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; display: block;"></i>
+                                        <p style="color: var(--text-muted);">No listings yet. <a href="{% url 'sell' %}" style="color: var(--primary-color);">Post your first ad!</a></p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Purchases Section -->
+            <section id="purchases" class="dashboard-section" style="display: none;">
+                <div class="dashboard-header">
+                    <h1>My Purchases</h1>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Purchase History</h2>
+                    </div>
+                    <div class="dashboard-card-body" style="padding: 0;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Seller</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="table-product">
+                                            <div class="table-product-image"><i class="fas fa-headphones" style="padding: 12px; color: var(--text-muted);"></i></div>
+                                            <div class="table-product-info">
+                                                <h4>Sony Headphones</h4>
+                                                <p>Electronics</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Priya Sharma</td>
+                                    <td>₹3,500</td>
+                                    <td>Feb 10, 2026</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline" onclick="downloadPurchaseInvoice()">
+                                            <i class="fas fa-download"></i> Invoice
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-product">
+                                            <div class="table-product-image"><i class="fas fa-book" style="padding: 12px; color: var(--text-muted);"></i></div>
+                                            <div class="table-product-info">
+                                                <h4>DSP Textbook</h4>
+                                                <p>Textbooks</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Amit Patel</td>
+                                    <td>₹180</td>
+                                    <td>Feb 5, 2026</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline" onclick="downloadPurchaseInvoice()">
+                                            <i class="fas fa-download"></i> Invoice
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wishlist Section -->
+            <section id="wishlist" class="dashboard-section" style="display: none;">
+                <div class="dashboard-header">
+                    <h1>My Wishlist</h1>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <div class="product-placeholder"><i class="fas fa-vr-cardboard"></i></div>
+                            <button class="wishlist-btn active"><i class="fas fa-heart"></i></button>
+                        </div>
+                        <div class="product-content">
+                            <div class="product-price">₹ 18,000</div>
+                            <h3 class="product-title">Oculus Quest 2 VR Headset</h3>
+                            <div class="product-meta">
+                                <span class="product-location"><i class="fas fa-map-marker-alt"></i> Campus</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <div class="product-placeholder"><i class="fas fa-chair"></i></div>
+                            <button class="wishlist-btn active"><i class="fas fa-heart"></i></button>
+                        </div>
+                        <div class="product-content">
+                            <div class="product-price">₹ 3,500</div>
+                            <h3 class="product-title">Ergonomic Study Chair</h3>
+                            <div class="product-meta">
+                                <span class="product-location"><i class="fas fa-map-marker-alt"></i> Mumbai</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="messages" class="dashboard-section" style="display: none;">
+                <div class="dashboard-header">
+                    <h1>Messages</h1>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-body" style="text-align: center; padding: 60px;">
+                        <i class="fas fa-comments" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <h3 style="color: var(--text-primary); margin-bottom: 8px;">Chat Coming Soon!</h3>
+                        <p style="color: var(--text-muted);">In-app messaging will be available soon. For now, use WhatsApp or call sellers directly.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="dashboard-section" style="display: none;">
+                <div class="dashboard-header">
+                    <h1>Account Settings</h1>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h2>Profile Information</h2>
+                    </div>
+                    <div class="dashboard-card-body">
+                        <form method="POST" action="{% url 'update_profile' %}">
+                            {% csrf_token %}
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" name="first_name" class="form-input" value="{{ user.first_name|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" name="last_name" class="form-input" value="{{ user.last_name|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-input" value="{{ user.email|default:'' }}" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" name="phone" class="form-input" value="{{ user.profile.phone|default:'' }}">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="margin-top: 16px;">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="dashboard-card" style="margin-top: 24px;">
+                    <div class="dashboard-card-header">
+                        <h2>Change Password</h2>
+                    </div>
+                    <div class="dashboard-card-body">
+                        <form method="POST" action="{% url 'change_password' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" name="current_password" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" name="new_password" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" name="confirm_password" class="form-input">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key"></i> Update Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showSection(sectionId, link) {
+    // Hide all sections
+    document.querySelectorAll('.dashboard-section').forEach(s => s.style.display = 'none');
+    // Show selected section
+    document.getElementById(sectionId).style.display = 'block';
+    // Update active nav
+    document.querySelectorAll('.dashboard-nav-item').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+}
+
+function deleteItem(itemId) {
+    if (confirm('Are you sure you want to delete this listing?')) {
+        // Send delete request
+        alert('Item deleted successfully!');
+        location.reload();
+    }
+}
+
+function downloadPurchaseInvoice() {
+    alert('Downloading invoice...');
+}
+</script>
+{% endblock %}
